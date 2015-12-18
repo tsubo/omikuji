@@ -22,8 +22,12 @@ class OmikujiController extends Controller
         $omikuji = ['大吉', '中吉', '小吉', '末吉', '凶'];
         $number = rand(0, count($omikuji) - 1);
 
-        return new Response(
-            "<html><body>{$yourname}さんの運勢は $omikuji[$number] です。</body></html>"
-        );
+//         return new Response(
+//             "<html><body>{$yourname}さんの運勢は $omikuji[$number] です。</body></html>"
+//         );
+        return $this->render('omikuji/omikuji.html.twig', [
+            'name' => $yourname,
+            'unsei' => $omikuji[$number],
+        ]);
     }
 }
