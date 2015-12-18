@@ -4,3 +4,8 @@
 .menu > li {
     display: inline-block;
 }
+
+.flash-notice {
+    background-color: #E0FFFF;
+    margin-bottom: 10px;
+}

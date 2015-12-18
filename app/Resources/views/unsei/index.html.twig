@@ -13,7 +13,12 @@
             <td>{{ unsei.name }}</td>
             <td>
                 <a href="{{ path('unsei_edit', {'id': unsei.id}) }}">編集</a>
-                削除
+
+                <form action="{{ path('unsei_delete', {'id': unsei.id}) }}" method="post" style="display:inline-block">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <input type="hidden" name="_token" value="{{ csrf_token('unsei') }}" />
+                    <input type="submit" value="削除" />
+                </form>
             </td>
         </tr>
         {% endfor %}

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Entity\Unsei;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use AppBundle\Form\UnseiType;
 
 /**
  * @Route("/unsei")
@@ -45,9 +46,11 @@ class UnseiController extends Controller
     {
         $unsei = new Unsei();
          
-        $form = $this->createFormBuilder($unsei)
-            ->add('name', TextType::class)
-            ->getForm();
+//         $form = $this->createFormBuilder($unsei)
+//             ->add('name', TextType::class)
+//             ->getForm();
+
+        $form = $this->createForm(UnseiType::class, $unsei);
         
         // Form送信のハンドリング
         $form->handleRequest($request);
@@ -56,6 +59,8 @@ class UnseiController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($unsei);
             $em->flush();
+            
+            $this->addFlash('notice', "{$unsei->getName()}を追加しました");
              
             return $this->redirectToRoute('unsei_index');
         }
@@ -76,7 +81,30 @@ class UnseiController extends Controller
      */
     public function editAction(Request $request, $id)
     {
-        return new Response('editAction');
+        $repository = $this->getDoctrine()->getRepository(Unsei::class);
+        $unsei = $repository->find($id);
+        
+        if (!$unsei) {
+            throw $this->createNotFoundException('No unsei found for id '.$id);
+        }
+         
+        $form = $this->createForm(UnseiType::class, $unsei, [
+            'method' => 'PUT',
+        ]);
+         
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $this->getDoctrine()->getManager();
+            $em->flush();
+            
+            $this->addFlash('notice', "{$unsei->getName()}に更新しました");
+             
+            return $this->redirectToRoute('unsei_index');
+        }
+        
+        return $this->render('unsei/edit.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
      
     /**
@@ -90,7 +118,22 @@ class UnseiController extends Controller
      */
     public function deleteAction(Request $request, $id)
     {
-        return new Response('deleteAction');
+        $repository = $this->getDoctrine()->getRepository(Unsei::class);
+        $unsei = $repository->find($id);
+        
+        if (!$unsei) {
+            throw $this->createNotFoundException('No unsei found for id '.$id);
+        }
+         
+        if ($this->isCsrfTokenValid('unsei', $request->get('_token'))) {
+            $em = $this->getDoctrine()->getManager();
+            $em->remove($unsei);
+            $em->flush();
+
+            $this->addFlash('notice', "{$unsei->getName()}を削除しました");
+        }
+        
+        return $this->redirectToRoute('unsei_index');
     }
     
     /**
